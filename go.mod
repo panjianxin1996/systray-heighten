@@ -1,4 +1,4 @@
-module github.com/getlantern/systray
+module github.com/panjianxin1996/systray-heighten
 
 go 1.13
 
