@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package systray
@@ -202,6 +203,14 @@ type winTray struct {
 
 	wmSystrayMessage,
 	wmTaskbarCreated uint32
+	leftClickHandler   func() // 新增：左键点击回调函数
+	muLeftClickHandler sync.RWMutex
+}
+
+func (t *winTray) SetLeftClick(cb func()) {
+	t.muLeftClickHandler.Lock()
+	defer t.muLeftClickHandler.Unlock()
+	t.leftClickHandler = cb
 }
 
 // Loads an image from file and shows it in tray.
@@ -243,6 +252,10 @@ func (t *winTray) setTooltip(src string) error {
 
 var wt winTray
 
+func (t *winTray) LeftClick(cb func()) {
+
+}
+
 // WindowProc callback function that processes messages sent to a window.
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633573(v=vs.85).aspx
 func (t *winTray) wndProc(hWnd windows.Handle, message uint32, wParam, lParam uintptr) (lResult uintptr) {
@@ -277,9 +290,17 @@ func (t *winTray) wndProc(hWnd windows.Handle, message uint32, wParam, lParam ui
 		systrayExit()
 	case t.wmSystrayMessage:
 		switch lParam {
-		case WM_RBUTTONUP, WM_LBUTTONUP:
+		case WM_LBUTTONUP:
+			t.muLeftClickHandler.RLock()
+			if t.leftClickHandler != nil {
+				t.leftClickHandler() // 触发左键回调
+			}
+			t.muLeftClickHandler.RUnlock()
+			return 0
+		case WM_RBUTTONUP:
 			t.showMenu()
 		}
+
 	case t.wmTaskbarCreated: // on explorer.exe restarts
 		t.muNID.Lock()
 		t.nid.add()

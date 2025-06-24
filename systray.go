@@ -234,3 +234,7 @@ func systrayMenuItemSelected(id uint32) {
 	default:
 	}
 }
+
+func SetLeftClickHandler(cb func()) {
+	wt.SetLeftClick(cb)
+}
