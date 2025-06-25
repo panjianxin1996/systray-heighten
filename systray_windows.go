@@ -207,7 +207,8 @@ type winTray struct {
 	muLeftClickHandler sync.RWMutex
 }
 
-func (t *winTray) SetLeftClick(cb func()) {
+// 处理鼠标左击事件
+func (t *winTray) SetLeftClickHandler(cb func()) {
 	t.muLeftClickHandler.Lock()
 	defer t.muLeftClickHandler.Unlock()
 	t.leftClickHandler = cb

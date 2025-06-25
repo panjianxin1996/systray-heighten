@@ -235,6 +235,15 @@ func systrayMenuItemSelected(id uint32) {
 	}
 }
 
-func SetLeftClickHandler(cb func()) {
-	wt.SetLeftClick(cb)
+// SetLeftClick 为特定平台设置左键点击事件的回调函数。
+// 该函数根据平台参数决定是否设置左键点击事件的回调函数，
+// 以及如何设置该回调函数。
+// 参数:
+//
+//	platform - 操作系统平台名称，"windows" "darwin" "linux"。
+//	cb - 当左键点击事件发生时要执行的回调函数。
+func SetLeftClick(platform string, cb func()) {
+	if platform == "windows" {
+		wt.SetLeftClickHandler(cb)
+	}
 }
